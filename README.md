@@ -98,6 +98,14 @@ $query = dbCJP::table("TABLE_NAME")
 или
 
 <pre>
+$query = dbCJP::table("TABLE_NAME")
+            ->where("id>=",5)
+            ->get();
+</pre>
+
+или
+
+<pre>
 $query = dbCJP::table("TABLE_ONE")
             ->select("
                         TABLE_ONE.*,
