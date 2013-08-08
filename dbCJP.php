@@ -31,7 +31,7 @@ class dbCJP
     private $_pagenav_query_result = NULL;
     private $_pagenav_limit = 20;
     private $_query_build = false;
-    private $_pagenav_template = '/manager/pgn_template.php';
+    private $_pagenav_template = '/bitrix/php_interface/myclass/pgn_template.php';
     private $_ar_offset = array();
     private $_count_get = NULL;
     private $_group_by = '';
@@ -44,6 +44,7 @@ class dbCJP
      */
     private $_config = array(
         'table'      => 'default_table_name',
+        'pg_class_path' => '/bitrix/php_interface/myclass/pgg_class.php';
         'engine'     => 'MyISAM',
         'cache'      => FALSE,
         'cache_time' => 3600
@@ -806,7 +807,7 @@ class dbCJP
                 return $str_content;
             }
         } else {
-            require_once ($_SERVER["DOCUMENT_ROOT"].'/bitrix/php_interface/taobao/pgg_class.php');
+            require_once ($_SERVER["DOCUMENT_ROOT"].$this->_config['pg_class_path']);
             $pglimit = $this->_pagenav_limit;
             $pgnum   = $this->_page_number;
             return  pgg::paggination_display(self::count($this->_query_temp), $pglimit, $pgnum);
