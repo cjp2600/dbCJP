@@ -268,13 +268,20 @@ class dbCJP
      */
     public function delete($where = null)
     {
-        global $DB;  self::_b_where();
-        if (is_null($where)||!is_array($where)||count($where)==0){
-            $strw = $this->_where;
-        } else {
+        global $DB;  self::_b_where(); $inDA = self::get_object_rows();
+
+        if (!is_null($where) && is_array($where) && (count($where)>0)) {
             $strw = " WHERE ";
             $strw .= self::__where_array($where);
         }
+        if (strlen($this->_where)>0){
+            $strw = $this->_where;
+        }
+        if ($inDA) {
+                $strw = " WHERE ";
+                $strw .= self::__where_array($inDA);
+        }
+        if (strlen($strw)>0){
         $DB->StartTransaction();
         $res = $DB->Query("DELETE FROM {$this->_table_name} {$strw} {$this->_sort_by} {$this->_limit}", false, "File: ".__FILE__."<br>Line: ".__LINE__);
         if($res)
@@ -282,6 +289,9 @@ class dbCJP
         else
             $DB->Rollback();
         return $res;
+        } else {
+            return false;
+        }
     }
 
     /**
