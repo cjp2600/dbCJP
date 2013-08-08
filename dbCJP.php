@@ -66,7 +66,7 @@ class dbCJP
     }
 
     /**
-     * Обновляем переменные.
+     * Обновляем свойства.
      */
     private function reset()
     {
