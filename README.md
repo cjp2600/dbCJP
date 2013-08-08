@@ -3,7 +3,7 @@ dbCJP
 
 dbCJP - ORM класс для Bitrix framework
 
-### insert (способ №1) ######
+### insert ######
 Добавление записи в таблицу.
 <pre>
 $table = dbCJP::table("TABLE_NAME");
@@ -12,8 +12,8 @@ $table->data = "data";
 $table->insert();
 </pre>
 
-### insert (способ №2) ######
-Добавление записи в таблицу.
+или
+
 <pre>
 dbCJP::table("TABLE_NAME")->insert(array(
         "name" => "name",
@@ -21,7 +21,7 @@ dbCJP::table("TABLE_NAME")->insert(array(
     ));
 </pre>
 
-### update (способ №1) ######
+### update ######
 Изменение записи в таблице.
 <pre>
 $table = dbCJP::table("TABLE_NAME");
@@ -30,8 +30,8 @@ $table->data  = "newdata";
 $table->where("id","345")->update();
 </pre>
 
-### update (способ №2) ######
-Изменение записи в таблице.
+или
+
 <pre>
 dbCJP::table("TABLE_NAME")
     ->where("id","345")
