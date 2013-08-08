@@ -128,7 +128,7 @@ $query = dbCJP::table("TABLE_ONE")
 <pre>
 foreach ($query->result() as $row ){
     
-    echo $row->name.' '.$row->fam . '<br>';
+    echo $row->name.' '.$row->fam ;
     
 }
 </pre>
