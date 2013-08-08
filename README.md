@@ -126,7 +126,7 @@ $query = dbCJP::table("TABLE_ONE")
             ->or_where("type","fiveparam")
             ->where("TABLE_TWO.IBLOCK_ID","1")
             ->join("TABLE_TWO","TABLE_ONE.elid = TABLE_TWO.NAME ")
-            ->join("TABLE_THREE","TABLE_TWO.ID = TABLE_THREE.IBLOCK_ELEMENT_ID $catStr")
+            ->join("TABLE_THREE","TABLE_TWO.ID = TABLE_THREE.IBLOCK_ELEMENT_ID AND TABLE_THREE.PROPERTY_111 LIKE '%".$var."%'")
             ->group_by("elid")
             ->order_by("PRES","DESC")
             ->get();
