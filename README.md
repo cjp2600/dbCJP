@@ -48,7 +48,7 @@ dbCJP::table("TABLE_NAME")
 ### delete ######
 Удаление записи из таблици.
 <pre>
-$tabale = dbCJP::table("PIJEY_NOWLOOK");
+$tabale = dbCJP::table("TABLE_NAME");
 $tabale->id = 345;
 $tabale->delete();
 </pre>
@@ -56,7 +56,7 @@ $tabale->delete();
 или
 
 <pre>
-dbCJP::table("PIJEY_NOWLOOK")
+dbCJP::table("TABLE_NAME")
     ->where("id","345")
     ->where("name","newname")
     ->or_where("date","newdate")
@@ -66,7 +66,7 @@ dbCJP::table("PIJEY_NOWLOOK")
 или
 
 <pre>
-dbCJP::table("PIJEY_NOWLOOK")
+dbCJP::table("TABLE_NAME")
     ->where(array(
         "id"   => "345",
         "name" => "newname",
@@ -77,5 +77,5 @@ dbCJP::table("PIJEY_NOWLOOK")
 или
 
 <pre>
-dbCJP::table("PIJEY_NOWLOOK")->delete(array("id"=>345));
+dbCJP::table("TABLE_NAME")->delete(array("id"=>345));
 </pre>
