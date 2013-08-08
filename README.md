@@ -79,3 +79,69 @@ dbCJP::table("TABLE_NAME")
 <pre>
 dbCJP::table("TABLE_NAME")->delete(array("id"=>345));
 </pre>
+
+### select Примеры: ######
+Выборка данных из таблици.
+<pre>
+$query = dbCJP::table("TABLE_NAME")->get();
+</pre>
+
+или
+
+<pre>
+$query = dbCJP::table("TABLE_NAME")
+            ->like("name","Стас")
+            ->not_like("fam","Иванов")
+            ->get();
+</pre>
+
+или
+
+<pre>
+$query = dbCJP::table("TABLE_ONE")
+            ->select("
+                        TABLE_ONE.*,
+                        TABLE_ONE.id as RID,
+                           (
+                           (SELECT SUM(`value`) FROM TABLE_ONE as TR WHERE (TR.type = 'oneparam' OR TR.type = 'twoparam' OR TR.type = 'threeparam') AND TR.elid = TABLE_ONE.elid ) /
+                           (SELECT COUNT(*) FROM TABLE_ONE as CTR WHERE (CTR.type = 'oneparam' OR CTR.type = 'twoparam' OR CTR.type = 'threeparam') AND CTR.elid = TABLE_ONE.elid)
+                            ) as PRES,
+                        TABLE_TWO.IBLOCK_ID,
+                        TABLE_TWO.NAME,
+                        TABLE_TWO.ID,
+                        TABLE_THREE.PROPERTY_111 as data")
+            ->where("type","set_text")
+            ->or_where("type","oneparam")
+            ->or_where("type","twoparam")
+            ->or_where("type","threeparam")
+            ->or_where("type","fourparam")
+            ->or_where("type","fiveparam")
+            ->where("TABLE_TWO.IBLOCK_ID","1")
+            ->join("TABLE_TWO","TABLE_ONE.elid = TABLE_TWO.NAME ")
+            ->join("TABLE_THREE","TABLE_TWO.ID = TABLE_THREE.IBLOCK_ELEMENT_ID $catStr")
+            ->group_by("elid")
+            ->order_by("PRES",$order)
+            ->get();
+</pre>
+
+### Вывод и обработка результата ######
+<pre>
+foreach ($query->result() as $row ){
+    
+    echo $row->name.' '.$row->fam . '<br>';
+    
+}
+</pre>
+
+### Вывод еденичного результата ######
+<pre>
+ $user = dbCJP::table("USERS")->where("id",1)->get()->row();
+
+ echo $user->name.' '.$user->fam;
+</pre>
+
+### Вывод количества записей ######
+<pre>
+$users = dbCJP::table("USERS")->get();
+echo $users->count_rows();
+</pre>
