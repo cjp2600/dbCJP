@@ -3,7 +3,7 @@ dbCJP
 
 dbCJP - ORM класс для Bitrix framework
 
-### Insert (вариант №1) ######
+### insert (способ №1) ######
 
 <pre>
 $table = dbCJP::table("TABLE_NAME");
