@@ -1,9 +1,9 @@
 <?php
 /**
- * ActiveRecords класс для Bitrix framework
+ * ORM класс для Bitrix framework
  * http://github.com/cjp2600
  *
- * Date: 16.07.13
+ * Date: 16.10.12
  * Time: 15:12
  * Автор: Станислав Семёнов (cjp2600), email: cjp2600@ya.ru
  */
@@ -30,9 +30,13 @@ class dbCJP
     private $_cache_id = null;
     private $_pagenav_query_result = NULL;
     private $_pagenav_limit = 20;
+    private $_query_build = false;
     private $_pagenav_template = '/manager/pgn_template.php';
     private $_ar_offset = array();
     private $_count_get = NULL;
+    private $_group_by = '';
+    private $_page_number = false;
+    private $_query_temp = '';
 
     /**
      * Конфиг с параметрами по умолчанию.
@@ -78,6 +82,7 @@ class dbCJP
         $this->_select = '*';
         $this->_ar_offset = array();
         $this->_count_get = NULL;
+        $this->_group_by = '';
     }
 
     /**
@@ -128,6 +133,11 @@ class dbCJP
         return $str;
     }
 
+    public function group_by($field){
+        $this->_group_by = " GROUP BY ".$field;
+        return $this;
+    }
+
     /**
      * @param $str
      * @return string
@@ -170,8 +180,9 @@ class dbCJP
      * @param bool $is
      * @return $this
      */
-    public function pagination($limit = null,$is = true){
+    public function pagination($limit = null,$is = true,$page_number = false){
         $this->_is_pagenav = $is;
+        $this->_page_number = $page_number;
         $this->_pagenav_limit = (!is_null($limit))? $limit : $this->_pagenav_limit;
         return $this;
     }
@@ -388,13 +399,13 @@ class dbCJP
             foreach (explode(',', $orderby) as $part)
             {
                 $part = trim($part);
-                $temp[] = $tprefix.$part;
+                $temp[] = $part;
             }
             $orderby = implode(', ', $temp);
         }
         else if ($direction != 'RAND()')
         {
-            $orderby = $tprefix.$orderby;
+            $orderby = $orderby;
         }
 
         $orderby_statement = $orderby.$direction;
@@ -416,6 +427,25 @@ class dbCJP
             $colAr[] = $arRes['Field'];
         }
         return $colAr;
+    }    /**
+     * @return array
+     */
+    function query($queryStr)
+    {
+        global $DB;
+        $strSql = $queryStr;
+        $result = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+        if ($this->_is_pagenav){
+            $result->NavStart($this->_pagenav_limit,false,$this->_page_number);
+            $this->_pagenav_query_result = $result;
+        }
+        $i = 0;
+        while ($arRes = $result->NavNext(true, "f_")) {
+            $this->_ar_get[] = (object)$arRes;
+            $i++;
+        }
+        $this->_count_get = $i;
+        return $this;
     }
 
     /**
@@ -458,18 +488,21 @@ class dbCJP
      */
     private function _b_where()
     {
-        if (count($this->_ar_like) > 0) {
-            $this->_ar_where[] = implode($this->_ar_like);
-        }
-        if (strlen($this->_ar_sort_by)>0) {
-            $this->_sort_by = " ORDER BY ".$this->_ar_sort_by;
-        }
-        $whstr = (count($this->_ar_where) > 0) ? ' WHERE ' : '';
-        $this->_where = $whstr . implode($this->_ar_where);
+        if (!$this->_query_build) {
+            if (count($this->_ar_like) > 0) {
+                $prf = (count($this->_ar_where) > 0)?' AND ':'';
+                $this->_ar_where[] = $prf.implode($this->_ar_like);
+            }
+            if (strlen($this->_ar_sort_by)>0) {
+                $this->_sort_by = " ORDER BY ".$this->_ar_sort_by;
+            }
+            $whstr = (count($this->_ar_where) > 0) ? ' WHERE ' : '';
+            $this->_where = $whstr . implode($this->_ar_where);
 
-        if (is_numeric($this->_ar_limit)) {
-            $offsetstr = (is_numeric($this->_ar_offset)) ? ", " . $this->_ar_offset : '';
-            $this->_limit = " LIMIT " . $this->_ar_limit . $offsetstr;
+            if (is_numeric($this->_ar_limit)) {
+                $offsetstr = (is_numeric($this->_ar_offset)) ? ", " . $this->_ar_offset : '';
+                $this->_limit = " LIMIT " . $this->_ar_limit . $offsetstr;
+            }
         }
     }
 
@@ -632,15 +665,34 @@ class dbCJP
      * Запрос на получение общего числа записей
      * @return int
      */
-    private function count()
+    private function count($query = null)
     {
         self::_b_where();
         global $DB;
+        if (is_null($query)){
         $strSql = "
-  		SELECT COUNT(*) AS CNT
+			SELECT COUNT(*) AS CNT
 			FROM `{$this->_table_name}` {$this->_where}
 		";
+        } else {
+            $strSql = "
+			SELECT COUNT(*) AS CNT
+			FROM `{$this->_table_name}` $query
+		    ";
+            $res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+            $call = $res->SelectedRowsCount();
+            if ($call <= 1){
+                if ($res_arr = $res->Fetch()) {
+                    return intval($res_arr["CNT"]);
+                } else {
+                    return 0;
+                }
+            } else {
+                return $call;
+            }
+        }
         $res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+
         if ($res_arr = $res->Fetch()) {
             return intval($res_arr["CNT"]);
         } else {
@@ -668,6 +720,7 @@ class dbCJP
         return false;
     }
 
+
     /**
      * Обработчик
      * @return $this
@@ -675,15 +728,18 @@ class dbCJP
     public function get()
     {
         self::_b_where();
+        $this->_query_build = true;
         $jonsrt = (count($this->_ar_join)>0)?implode($this->_ar_join," "):'';
+
         global $DB;
         $strSql = "
-			SELECT {$this->_select} FROM `{$this->_table_name}` {$jonsrt} {$this->_where} {$this->_sort_by} {$this->_limit}
+			SELECT {$this->_select} FROM `{$this->_table_name}` {$jonsrt} {$this->_where} {$this->_group_by} {$this->_sort_by} {$this->_limit}
 		";
-        $this->_cache_id = md5($strSql);
+        //echo "<pre>"; print_r($strSql); echo "</pre>";
+        $this->_query_temp = " {$jonsrt} {$this->_where} {$this->_group_by} {$this->_limit} ";
             $result = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
             if ($this->_is_pagenav){
-                $result->NavStart($this->_pagenav_limit);
+                $result->NavStart($this->_pagenav_limit,false,$this->_page_number);
                 $this->_pagenav_query_result = $result;
             }
             $i = 0;
@@ -692,7 +748,6 @@ class dbCJP
                 $i++;
             }
             $this->_count_get = $i;
-
         return $this;
     }
 
@@ -709,7 +764,11 @@ class dbCJP
      * @return bool|null
      */
     public function cache_id(){
-        return (!is_null($this->_cache_id))?$this->_cache_id:false;
+        self::_b_where();
+        $this->_query_build = true;
+        $jonsrt = (count($this->_ar_join)>0)?implode($this->_ar_join," "):'';
+        $re = $this->_select.$this->_table_name.$jonsrt.$this->_where.$this->_sort_by.$this->_limit;
+        return hash("crc32",$re);
     }
 
     /**
@@ -719,10 +778,22 @@ class dbCJP
      * @return mixed
      */
     public function pagination_print($title=null,$template = null){
-        if ($this->_is_pagenav){
-            $this->_pagenav_template = (!is_null($template))?$template:$this->_pagenav_template;
-            $this->_pagenav_title = (!is_null($title))? $title : $this->_pagenav_title;
-          return $this->_pagenav_query_result->NavPrint($this->_pagenav_title,false,false,$this->_pagenav_template);
+        if (!$this->_page_number) {
+            if ($this->_is_pagenav){
+                $this->_pagenav_template = (!is_null($template))?$template:$this->_pagenav_template;
+                $this->_pagenav_title = (!is_null($title))? $title : $this->_pagenav_title;
+
+                ob_start();
+                $this->_pagenav_query_result->NavPrint($this->_pagenav_title,false,false,$this->_pagenav_template);
+                $str_content = ob_get_contents();
+                ob_end_clean();
+                return $str_content;
+            }
+        } else {
+            require_once ($_SERVER["DOCUMENT_ROOT"].'/bitrix/php_interface/taobao/pgg_class.php');
+            $pglimit = $this->_pagenav_limit;
+            $pgnum   = $this->_page_number;
+            return  pgg::paggination_display(self::count($this->_query_temp), $pglimit, $pgnum);
         }
     }
 
