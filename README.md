@@ -44,3 +44,38 @@ dbCJP::table("TABLE_NAME")
 dbCJP::table("TABLE_NAME")
     ->update(array("name"=>"newname","data"=>"newdata"),array("id"=>"345"));
 </pre>
+
+### delete ######
+Удаление записи из таблици.
+<pre>
+$tabale = dbCJP::table("PIJEY_NOWLOOK");
+$tabale->id = 345;
+$tabale->delete();
+</pre>
+
+или
+
+<pre>
+dbCJP::table("PIJEY_NOWLOOK")
+    ->where("id","345")
+    ->where("name","newname")
+    ->or_where("date","newdate")
+    ->delete();
+</pre>
+
+или
+
+<pre>
+dbCJP::table("PIJEY_NOWLOOK")
+    ->where(array(
+        "id"   => "345",
+        "name" => "newname",
+    ))
+    ->limit(1)->delete();
+</pre>
+
+или
+
+<pre>
+dbCJP::table("PIJEY_NOWLOOK")->delete(array("id"=>345));
+</pre>
