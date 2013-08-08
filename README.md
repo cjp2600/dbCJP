@@ -35,12 +35,12 @@ $table->where("id","345")->update();
 <pre>
 dbCJP::table("TABLE_NAME")
     ->where("id","345")
-    ->update(array("name"=>"newname","data","newdata"));
+    ->update(array("name"=>"newname","data"=>"newdata"));
 </pre>
 
 или
 
 <pre>
 dbCJP::table("TABLE_NAME")
-    ->update(array("name"=>"newname","data","newdata"),array("id"=>"345"));
+    ->update(array("name"=>"newname","data"=>"newdata"),array("id"=>"345"));
 </pre>
