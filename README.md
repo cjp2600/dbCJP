@@ -15,8 +15,17 @@ $table->insert();
 ### insert (способ №2) ######
 Добавление записи в таблицу.
 <pre>
-dbCJP::table("PIJEY_NOWLOOK")->insert(array(
+dbCJP::table("TABLE_NAME")->insert(array(
         "name" => "name",
         "data" => "data"
     ));
+</pre>
+
+### update (способ №1) ######
+Изменение записи в таблице.
+<pre>
+$table = dbCJP::table("TABLE_NAME");
+$table->name  = "newname";
+$table->data  = "newdata";
+$table->where("id","345")->update();
 </pre>
