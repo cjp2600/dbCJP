@@ -128,7 +128,7 @@ $query = dbCJP::table("TABLE_ONE")
             ->join("TABLE_TWO","TABLE_ONE.elid = TABLE_TWO.NAME ")
             ->join("TABLE_THREE","TABLE_TWO.ID = TABLE_THREE.IBLOCK_ELEMENT_ID $catStr")
             ->group_by("elid")
-            ->order_by("PRES",$order)
+            ->order_by("PRES","DESC")
             ->get();
 </pre>
 
