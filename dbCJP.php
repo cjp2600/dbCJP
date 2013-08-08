@@ -132,7 +132,11 @@ class dbCJP
         }
         return $str;
     }
-
+    
+   /**
+    * @param $field
+    * @return $this
+    */
     public function group_by($field){
         $this->_group_by = " GROUP BY ".$field;
         return $this;
@@ -427,7 +431,9 @@ class dbCJP
             $colAr[] = $arRes['Field'];
         }
         return $colAr;
-    }    /**
+    }    
+    
+    /**
      * @return array
      */
     function query($queryStr)
