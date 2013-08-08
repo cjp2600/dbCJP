@@ -396,7 +396,7 @@ class dbCJP
      * @param null $tprefix
      * @return $this
      */
-    function order_by($orderby, $direction = '',$tprefix = null)
+    public function order_by($orderby, $direction = '',$tprefix = null)
     {
         $tprefix = (is_null($tprefix))? $this->_table_name."." : $tprefix.".";
         if (strtolower($direction) == 'random')
@@ -432,7 +432,7 @@ class dbCJP
     /**
      * @return array
      */
-    function get_column()
+    public function get_column()
     {
         global $DB;
         $strSql = "SHOW COLUMNS FROM " . $this->_table_name;
@@ -447,7 +447,7 @@ class dbCJP
     /**
      * @return array
      */
-    function query($queryStr)
+    public function query($queryStr)
     {
         global $DB;
         $strSql = $queryStr;
@@ -471,7 +471,7 @@ class dbCJP
      * @param string $type
      * @return $this
      */
-    function where($key, $value = NULL, $type = 'AND')
+    public function where($key, $value = NULL, $type = 'AND')
     {
         if (!is_array($key)) {
             $key = array($key => $value);
@@ -491,7 +491,7 @@ class dbCJP
      * @param $str
      * @return bool
      */
-    function _has_operator($str)
+    public function _has_operator($str)
     {
         $str = trim($str);
         if (!preg_match("/(\s|<|>|!|=|is null|is not null)/i", $str)) {
@@ -530,7 +530,7 @@ class dbCJP
      * @param string $type
      * @return $this
      */
-    function _where_in($key = NULL, $values = NULL, $not = FALSE, $type = 'AND ')
+    public function _where_in($key = NULL, $values = NULL, $not = FALSE, $type = 'AND ')
     {
         if ($key === NULL OR $values === NULL) {
             return false;
@@ -554,7 +554,7 @@ class dbCJP
      * @param null $values
      * @return $this
      */
-    function where_in($key = NULL, $values = NULL)
+    public function where_in($key = NULL, $values = NULL)
     {
         return self::_where_in($key, $values);
     }
@@ -564,7 +564,7 @@ class dbCJP
      * @param null $values
      * @return $this
      */
-    function or_where_in($key = NULL, $values = NULL)
+    public function or_where_in($key = NULL, $values = NULL)
     {
         return self::_where_in($key, $values, FALSE, 'OR');
     }
@@ -574,7 +574,7 @@ class dbCJP
      * @param null $values
      * @return $this
      */
-    function where_not_in($key = NULL, $values = NULL)
+    public function where_not_in($key = NULL, $values = NULL)
     {
         return self::_where_in($key, $values, TRUE);
     }
@@ -584,7 +584,7 @@ class dbCJP
      * @param null $values
      * @return $this
      */
-    function or_where_not_in($key = NULL, $values = NULL)
+    public function or_where_not_in($key = NULL, $values = NULL)
     {
         return self::_where_in($key, $values, TRUE, 'OR');
     }
@@ -626,7 +626,7 @@ class dbCJP
      * @param string $side
      * @return $this
      */
-    function like($field, $match = '', $side = 'both')
+    public function like($field, $match = '', $side = 'both')
     {
         return self::_like($field, $match, 'AND ', $side);
     }
@@ -638,7 +638,7 @@ class dbCJP
      * @param string $side
      * @return $this
      */
-    function not_like($field, $match = '', $side = 'both')
+    public function not_like($field, $match = '', $side = 'both')
     {
         return self::_like($field, $match, 'AND ', $side, 'NOT');
     }
@@ -650,7 +650,7 @@ class dbCJP
      * @param string $side
      * @return $this
      */
-    function or_like($field, $match = '', $side = 'both')
+    public function or_like($field, $match = '', $side = 'both')
     {
         return self::_like($field, $match, 'OR ', $side);
     }
@@ -662,7 +662,7 @@ class dbCJP
      * @param string $side
      * @return $this
      */
-    function or_not_like($field, $match = '', $side = 'both')
+    public function or_not_like($field, $match = '', $side = 'both')
     {
         return $this->_like($field, $match, 'OR ', $side, 'NOT');
     }
@@ -673,7 +673,7 @@ class dbCJP
      * @param null $value
      * @return $this
      */
-    function or_where($key, $value = NULL)
+    public function or_where($key, $value = NULL)
     {
         return self::where($key, $value, 'OR');
     }
