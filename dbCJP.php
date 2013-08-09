@@ -447,10 +447,9 @@ class dbCJP
     /**
      * @return array
      */
-    public function query($queryStr)
+    public function query($strSql)
     {
         global $DB;
-        $strSql = $queryStr;
         $result = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
         if ($this->_is_pagenav){
             $result->NavStart($this->_pagenav_limit,false,$this->_page_number);
