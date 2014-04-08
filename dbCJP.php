@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * ORM класс для Bitrix framework
  * http://github.com/cjp2600
@@ -88,6 +88,7 @@ class dbCJP
 
     /**
      * @param $config
+     *
      * @return dbCJP
      */
     public static function init($config)
